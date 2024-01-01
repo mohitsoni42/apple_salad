@@ -1,0 +1,111 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hand-Eye Coordination Game</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f5f5f5;
+            cursor: default;
+        }
+
+        #game-container {
+            position: relative;
+            width: 600px; /* Increased size to 2x */
+            height: 600px; /* Increased size to 2x */
+            border: 1px solid #000;
+            margin-bottom: 20px;
+            background-color: #fff;
+            overflow: hidden; /* Ensure balls stay within the container */
+        }
+
+        .ball {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            background-size: cover;
+        }
+
+        button#stop-btn {
+            background-color: #f44336; /* Red color for the Stop button */
+        }
+
+        button:active {
+            transform: scale(0.95); /* Scale down when a button is clicked */
+        }
+
+        .car {
+            background-image: url('https://imgs.search.brave.com/ZLiDMFaMY7yHdSAj_8ifUt1CB_RTxig72oibU5gVxmE/rs:fit:500:0:0/g:ce/aHR0cHM6Ly90My5m/dGNkbi5uZXQvanBn/LzAxLzY1LzcyLzU0/LzM2MF9GXzE2NTcy/NTQyM19rb3N3em9k/MkloN2NZcE5zTDZj/OFJDZUk1b0lYT3BW/ei5qcGc');
+            width: 50px;
+            height: 50px;
+            border-radius: 2px;
+        }
+
+        .fruit {
+            background-image: url('https://imgs.search.brave.com/gPvQucaLy0EiWV9X1120jIOR38DZT9wPG2scHOaa5rI/rs:fit:500:0:0/g:ce/aHR0cHM6Ly93d3cu/aWNvbnBhY2tzLm5l/dC9pY29ucy8yL2Zy/ZWUtYXBwbGUtaWNv/bi0yMzI3LnBuZw');
+            width: 50px;
+            height: 50px;
+            position: absolute;
+            cursor: pointer;
+            background-size: cover;
+        }
+
+        #tools-container {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        button {
+            margin: 0 10px;
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+        }
+
+        #timer-container {
+            font-size: 24px;
+            color: #333;
+        }
+
+        #score-container {
+            font-size: 18px;
+            color: #333;
+        }
+
+        #encouragement {
+            margin-top: 10px;
+            font-size: 16px;
+            color: #4caf50;
+        }
+    </style>
+</head>
+<body>
+    <H2>Apple Salad</H2>
+    <div id="timer-container"></div>
+
+    <div id="game-container">
+        <!-- Balls will be dynamically added here -->
+    </div>
+
+    <button id="start-btn" onclick="startGame()">Start Game</button>
+
+
+    <div id="score-container"></div>
+    <div id="encouragement"></div>
+
+    <script src="{% static 'game/game.js' %}"></script>
+</body>
+</html>
