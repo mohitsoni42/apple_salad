@@ -9,10 +9,17 @@
 
 </head>
 
+<script>
+    function playGame() {
+        // Redirect to the Django game view
+        window.location.href = '{% url "game" %}';
+    }
+</script>
+
 <body>
     <h1>Welcome to Your Game</h1>
     <p>Click the link below to play the game:</p>
-    <a href="{% url 'game' %}">Play Game</a>
+    <a href="#" onclick="playGame()">Play game</a>
 </body>
 
 </html>
