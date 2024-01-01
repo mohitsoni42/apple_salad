@@ -7,7 +7,8 @@ let gameContainer;
 let gameInterval;
 let timerUpdateInterval;
 let score = 0;
-let timer = 30;
+let timer = 20;
+let encouragementDisplayed = false;
 
 function initializeGame() {
     gameContainer = document.getElementById('game-container');
@@ -17,6 +18,19 @@ function initializeGame() {
     updateScore();
 }
 
+function getEncouragementMessage() {
+    const messages = [
+        'Well done! Your final score is',
+        'Amazing! You scored',
+        'Great job! Your score is',
+        'Fantastic! You achieved a score of',
+        'Impressive! Your final score is'
+    ];
+
+    const randomIndex = Math.floor(Math.random() * messages.length);
+    return messages[randomIndex];
+}
+
 function startGame() {
     document.getElementById('start-btn').disabled = true;
 
@@ -24,8 +38,15 @@ function startGame() {
     updateScore();
     timer = 30;
 
+    // Set initial speed factor
+    let speedFactor = 1.0;
+
     // Uncomment the line below to enable the interval for creating fruits
-    gameInterval = setInterval(createRandomFruit, 1000);
+    gameInterval = setInterval(() => {
+        createRandomFruit();
+        // Increase speed factor by 10% each second
+        speedFactor *= 1.10;
+    }, 1000 / speedFactor);
 
     // Display and update the timer
     const timerContainer = document.getElementById('timer-container');
@@ -40,6 +61,7 @@ function startGame() {
     }, 1000);
 }
 
+
 function stopGame() {
     clearInterval(gameInterval);
     clearInterval(timerUpdateInterval);
@@ -47,7 +69,18 @@ function stopGame() {
     const encouragementMessage = 'Well done! Your final score is';
     const finalMessage = `${encouragementMessage} ${score}. Play again to improve!`;
 
-    document.getElementById('encouragement').innerText = finalMessage;
+    // Create a message element
+    const messageElement = document.createElement('div');
+    messageElement.innerText = finalMessage;
+    messageElement.style.fontSize = '30px';
+    messageElement.style.color = '#C70039';
+    messageElement.style.position = 'absolute';
+    messageElement.style.top = '50%';
+    messageElement.style.left = '50%';
+    messageElement.style.transform = 'translate(-50%, -50%)';
+
+    // Append the message to the game container
+    gameContainer.appendChild(messageElement);
 
     // Clear the timer display
     document.getElementById('timer-container').innerText = '';
@@ -57,6 +90,16 @@ function stopGame() {
 
     // Enable the start button after stopping the game
     document.getElementById('start-btn').disabled = false;
+}
+
+
+
+
+function removeEncouragementContainer() {
+    const encouragementContainer = document.getElementById('encouragement-container');
+    if (encouragementContainer) {
+        encouragementContainer.remove();
+    }
 }
 
 function createRandomFruit() {
@@ -76,6 +119,7 @@ function createRandomFruit() {
 
     // Attach hover event to the fruit
     fruit.addEventListener('mouseover', () => {
+        playHoverSound(); 
         gameContainer.removeChild(fruit);
         updateScore();
     });
@@ -105,7 +149,15 @@ function updateScore() {
     document.getElementById('score-container').innerText = `Score: ${score}`;
 }
 
+function playHoverSound() {
+    const hoverSound = document.getElementById('hover-sound');
+    hoverSound.currentTime = 0; // Reset the sound to the beginning
+    hoverSound.play();
+}
 
+document.querySelector('.fruit').addEventListener('mouseover', function() {
+    document.getElementById('hover-sound').play();
+});
 
 // 1. heading Apple Salad should be fancy, and it should look cool and colorful for kids.
 // 2. the whitespace on side of the game div should be filled be some color and gaming text.
