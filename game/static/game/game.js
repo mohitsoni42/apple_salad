@@ -1,4 +1,3 @@
-// your_app/static/your_app/game.js
 document.addEventListener('DOMContentLoaded', function () {
     initializeGame();
 });
@@ -9,6 +8,7 @@ let timerUpdateInterval;
 let score = 0;
 let timer = 20;
 let encouragementDisplayed = false;
+let badFruitClicked = false;
 
 function initializeGame() {
     gameContainer = document.getElementById('game-container');
@@ -34,6 +34,9 @@ function getEncouragementMessage() {
 function startGame() {
     document.getElementById('start-btn').disabled = true;
 
+    // Clear existing message elements
+    document.querySelectorAll('.encouragement-message').forEach(messageElement => gameContainer.removeChild(messageElement));
+
     score = 0;
     updateScore();
     timer = 30;
@@ -43,9 +46,13 @@ function startGame() {
 
     // Uncomment the line below to enable the interval for creating fruits
     gameInterval = setInterval(() => {
-        createRandomFruit();
-        // Increase speed factor by 10% each second
-        speedFactor *= 1.10;
+        if (timer === 0) {
+            stopGame();
+        } else {
+            createRandomFruit();
+            // Increase speed factor by 10% each second
+            speedFactor *= 1.10;
+        }
     }, 1000 / speedFactor);
 
     // Display and update the timer
@@ -59,19 +66,27 @@ function startGame() {
             timerContainer.innerText = `Time: ${timer}`;
         }
     }, 1000);
-}
 
+     // Enable the start button after stopping the game
+     document.getElementById('start-btn').disabled = true;
+}
 
 function stopGame() {
     clearInterval(gameInterval);
     clearInterval(timerUpdateInterval);
 
-    const encouragementMessage = 'Well done! Your final score is';
-    const finalMessage = `${encouragementMessage} ${score}. Play again to improve!`;
+    // Clear previous fruits and bad fruits
+    document.querySelectorAll('.fruit, .bad-fruit').forEach(fruit => gameContainer.removeChild(fruit));
+
+    // Clear existing message elements
+    document.querySelectorAll('.encouragement-message').forEach(messageElement => gameContainer.removeChild(messageElement));
+
+    const encouragementMessage = badFruitClicked ? "Oh no! You cut a bad apple. Can't make the salad now." : `Well done! Your final score is ${score}`;
 
     // Create a message element
     const messageElement = document.createElement('div');
-    messageElement.innerText = finalMessage;
+    messageElement.classList.add('encouragement-message');
+    messageElement.innerText = encouragementMessage;
     messageElement.style.fontSize = '30px';
     messageElement.style.color = '#C70039';
     messageElement.style.position = 'absolute';
@@ -82,18 +97,18 @@ function stopGame() {
     // Append the message to the game container
     gameContainer.appendChild(messageElement);
 
-    // Clear the timer display
-    document.getElementById('timer-container').innerText = '';
-
-    // Clear previous fruits
-    document.querySelectorAll('.fruit').forEach(fruit => gameContainer.removeChild(fruit));
+    // Display the timer if it's not a bad fruit click
+    if (!badFruitClicked) {
+        // Clear the timer display
+        document.getElementById('timer-container').innerText = '';
+    }
 
     // Enable the start button after stopping the game
     document.getElementById('start-btn').disabled = false;
+
+    // Reset flags
+    badFruitClicked = false;
 }
-
-
-
 
 function removeEncouragementContainer() {
     const encouragementContainer = document.getElementById('encouragement-container');
@@ -119,7 +134,7 @@ function createRandomFruit() {
 
     // Attach hover event to the fruit
     fruit.addEventListener('mouseover', () => {
-        playHoverSound(); 
+        playHoverSound();
         gameContainer.removeChild(fruit);
         updateScore();
     });
@@ -128,6 +143,13 @@ function createRandomFruit() {
 
     // Animate the fruit's downward movement
     animateFruit(fruit);
+
+    // Adjust the probability for creating a bad fruit
+    const createBadFruit = Math.random() < 0.1;
+
+    if (createBadFruit) {
+        createBadFruitElement();
+    }
 }
 
 function animateFruit(fruit) {
@@ -144,6 +166,39 @@ function animateFruit(fruit) {
     }, 30);
 }
 
+function createBadFruitElement() {
+    if (badFruitClicked) {
+        return; // Do not create more bad fruits if one has been clicked
+    }
+
+    const badFruit = document.createElement('div');
+    badFruit.classList.add('bad-fruit');
+
+    // Set random position at the top of the game container
+    const maxX = gameContainer.clientWidth - 50;
+    const randomX = Math.floor(Math.random() * maxX);
+
+    badFruit.style.left = `${randomX}px`;
+    badFruit.style.top = '0';
+
+    gameContainer.appendChild(badFruit);
+
+    // Attach hover event to the bad-fruit
+    badFruit.addEventListener('mouseover', () => {
+        badFruitClicked = true; // Set the flag to true
+
+        // Stop the game and display the message for clicking a bad fruit
+        stopGame();
+
+        // Play the sound for bad fruits
+        playHoverSound();
+    });
+
+    // Animate the bad-fruit's downward movement
+    animateFruit(badFruit);
+}
+
+
 function updateScore() {
     score++;
     document.getElementById('score-container').innerText = `Score: ${score}`;
@@ -155,7 +210,7 @@ function playHoverSound() {
     hoverSound.play();
 }
 
-document.querySelector('.fruit').addEventListener('mouseover', function() {
+document.querySelector('.fruit').addEventListener('mouseover', function () {
     document.getElementById('hover-sound').play();
 });
 
