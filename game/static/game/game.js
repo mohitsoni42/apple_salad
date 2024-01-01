@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
     initializeGame();
+    initializeComet();
 });
 
 let gameContainer;
@@ -9,6 +10,53 @@ let score = 0;
 let timer = 20;
 let encouragementDisplayed = false;
 let badFruitClicked = false;
+let comet;
+
+
+const trailCanvas = document.getElementById('trail-canvas');
+const trailCtx = trailCanvas.getContext('2d');
+const trail = [];
+
+function addTrailPoint(x, y) {
+    trail.push({ x, y, createdAt: Date.now() });
+}
+
+function drawTrail() {
+    trailCtx.clearRect(0, 0, trailCanvas.width, trailCanvas.height);
+    const radius = 5; // Adjust the radius of each point
+
+    for (let i = 0; i < trail.length; i++) {
+        const point = trail[i];
+        const lifeLeft = 1 - (Date.now() - point.createdAt) / 500; // Adjust the duration of the trail
+
+        if (lifeLeft > 0) {
+            const alpha = lifeLeft > 0.5 ? 1 : lifeLeft * 2; // Adjust the alpha (transparency) based on lifeLeft
+            trailCtx.fillStyle = `rgba(128, 255, 128, ${alpha})`; // Adjust the color
+
+            trailCtx.beginPath();
+            trailCtx.arc(point.x, point.y, radius, 0, 2 * Math.PI);
+            trailCtx.fill();
+        }
+    }
+}
+
+
+// Event listener for mousemove to update the trail
+document.addEventListener('mousemove', (event) => {
+    const { clientX, clientY } = event;
+    addTrailPoint(clientX, clientY);
+});
+
+// Function to animate the trail
+function animateTrail() {
+    drawTrail();
+    requestAnimationFrame(animateTrail);
+}
+
+// Start animating the trail
+animateTrail();
+
+
 
 function initializeGame() {
     gameContainer = document.getElementById('game-container');
@@ -17,6 +65,31 @@ function initializeGame() {
 
     updateScore();
 }
+
+function initializeComet() {
+    comet = document.createElement('div');
+    comet.classList.add('comet');
+    gameContainer.appendChild(comet);
+  
+    gameContainer.addEventListener('mousemove', moveComet);
+  }
+  
+function moveComet(event) {
+    const cometSize = 20;
+    const cometSpeed = 0.1;
+  
+    const x = event.clientX - cometSize / 2;
+    const y = event.clientY - cometSize / 2;
+  
+    comet.style.left = `${x}px`;
+    comet.style.top = `${y}px`;
+    comet.style.opacity = 1;
+  
+    setTimeout(() => {
+      comet.style.opacity = 0;
+    }, 500);
+  }
+  
 
 function getEncouragementMessage() {
     const messages = [

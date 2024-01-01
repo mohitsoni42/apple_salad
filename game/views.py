@@ -4,4 +4,4 @@ from .models import Score
 # Create your views here.
 
 def game(request):
-    return render(request, 'game/index.html')
+    return render(request, 'game/game.html')

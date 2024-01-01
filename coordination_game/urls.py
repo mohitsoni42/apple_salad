@@ -17,8 +17,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from game.views import game
+from django.conf.urls.static import static
+from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', game, name='game'),
-]
+    path('game', game, name='game'),
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
